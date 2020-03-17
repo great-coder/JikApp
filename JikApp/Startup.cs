@@ -15,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using JikApp.Areas.Identity;
 using JikApp.Data;
+using Blazor.Extensions.Storage;
+using JikApp.Hubs;
 
 namespace JikApp
 {
@@ -38,6 +40,8 @@ namespace JikApp
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddStorage();
+            services.AddSignalR();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddSingleton<WeatherForecastService>();
         }
@@ -70,6 +74,7 @@ namespace JikApp
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapHub<ChatHub>("/hubs/chat");
             });
         }
     }
