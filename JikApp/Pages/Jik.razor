@@ -1,0 +1,109 @@
+﻿@page "/jik"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.SignalR.Client;
+@using System.Security.Claims;
+
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<AuthorizeView>
+    <Authorized>
+        <h1>Hello, @context.User.Identity.Name!</h1>
+        <form class="form-inline" action="#" @onsubmit="SendAsync">
+            Say something:
+            <input class="form-control" @bind="message" disabled="@(!IsConnected)" />
+            <button class="btn btn-primary" disabled="@(!IsConnected)">Send</button>
+        </form>
+        <hr/>
+        <ul>
+            @foreach (var jik in messages)
+            {
+                if (jik.SenderId == user.Identity.Name)
+                {
+                    <li class="bg-info list-group-item" dir="rtl">
+                        <strong><small>@jik.SenderId</small></strong>
+                        <p>@jik.Message</p>
+                        <small>@jik.Created_At</small>
+                    </li>
+                }
+                else
+                {
+                    <li class="list-group-item">
+                        <strong><small>@jik.SenderId</small></strong>
+                        <p>@jik.Message</p>
+                        <small>@jik.Created_At</small>
+                    </li>
+                }
+            }
+        </ul>
+
+        @code {
+            [CascadingParameter]
+            private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+            public ClaimsPrincipal user;
+
+            string message;
+            IList<Data.Jik> messages = new List<Data.Jik>();
+            private HubConnection _hubConnection;
+
+            protected override async Task OnInitializedAsync()
+            {
+                user = (await authenticationStateTask).User;
+                if (user.Identity.IsAuthenticated)
+                {
+                    // Perform an action only available to authenticated (signed-in) users.
+                    _hubConnection = new HubConnectionBuilder()
+                            .WithUrl(NavigationManager.ToAbsoluteUri("/hubs/chat"))
+                            .WithAutomaticReconnect()
+                            .Build();
+
+                    _hubConnection.On<Data.Jik>("SendAction", this.OnMessage);
+                    _hubConnection.On<Data.Jik>("SendMessage", this.OnMessage);
+                    _hubConnection.On<List<Data.Jik>>("GetJiksAction", this.OnGetJiks);
+                    await _hubConnection.StartAsync();
+
+                    await GetJiksAsync();
+                }
+            }
+
+            Task OnMessage(Data.Jik jik)
+            {
+                messages.Add(jik);
+                StateHasChanged();
+                return Task.CompletedTask;
+            }
+
+            Task OnGetJiks(List<Data.Jik> jiks)
+            {
+                messages = jiks;
+                StateHasChanged();
+                return Task.CompletedTask;
+            }
+
+            async Task SendAsync()
+            {
+                if (message.Length >= 2)
+                {
+                    await _hubConnection.InvokeAsync("Send", new Data.Jik()
+                    {
+                        SenderId = user.Identity.Name,
+                        Message = message,
+                        Created_At = DateTime.Now
+                    });
+                    message = "";
+                }
+            }
+
+            async Task GetJiksAsync()
+            {
+                await _hubConnection.InvokeAsync("GetJiks");
+            }
+
+            public bool IsConnected =>
+                _hubConnection.State == HubConnectionState.Connected;
+        }
+    </Authorized>
+
+</AuthorizeView>
