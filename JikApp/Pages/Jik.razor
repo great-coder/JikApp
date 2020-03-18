@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.SignalR.Client;
 @using System.Security.Claims;
+@using JikApp.Components;
 
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
@@ -15,26 +16,11 @@
             <input class="form-control" @bind="message" disabled="@(!IsConnected)" />
             <button class="btn btn-primary" disabled="@(!IsConnected)">Send</button>
         </form>
-        <hr/>
+        <hr />
         <ul>
             @foreach (var jik in messages)
             {
-                if (jik.SenderId == user.Identity.Name)
-                {
-                    <li class="bg-info list-group-item" dir="rtl">
-                        <strong><small>@jik.SenderId</small></strong>
-                        <p>@jik.Message</p>
-                        <small>@jik.Created_At</small>
-                    </li>
-                }
-                else
-                {
-                    <li class="list-group-item">
-                        <strong><small>@jik.SenderId</small></strong>
-                        <p>@jik.Message</p>
-                        <small>@jik.Created_At</small>
-                    </li>
-                }
+                <JikComponent jik="jik" CurrentUserId="@user.Identity.Name" />
             }
         </ul>
 
@@ -59,8 +45,8 @@
                             .WithAutomaticReconnect()
                             .Build();
 
-                    _hubConnection.On<Data.Jik>("SendAction", this.OnMessage);
-                    _hubConnection.On<Data.Jik>("SendMessage", this.OnMessage);
+                    _hubConnection.On<string>("SendSystemAction", this.OnSystemBroadcast);
+                    _hubConnection.On<Data.Jik>("SendJikAction", this.OnMessage);
                     _hubConnection.On<List<Data.Jik>>("GetJiksAction", this.OnGetJiks);
                     await _hubConnection.StartAsync();
 
@@ -68,9 +54,16 @@
                 }
             }
 
+            Task OnSystemBroadcast(string message)
+            {
+                // TODO: Show system message in a proper way!
+                Console.WriteLine(message);
+                return Task.CompletedTask;
+            }
+
             Task OnMessage(Data.Jik jik)
             {
-                messages.Add(jik);
+                messages.Insert(0, jik);
                 StateHasChanged();
                 return Task.CompletedTask;
             }
@@ -86,7 +79,7 @@
             {
                 if (message.Length >= 2)
                 {
-                    await _hubConnection.InvokeAsync("Send", new Data.Jik()
+                    await _hubConnection.InvokeAsync("SendJik", new Data.Jik()
                     {
                         SenderId = user.Identity.Name,
                         Message = message,
