@@ -10,7 +10,7 @@
 
 <AuthorizeView>
     <Authorized>
-        <h1>Hello, @context.User.Identity.Name!</h1>
+        <h3>Hello, @context.User.Identity.Name!</h3>
         <form class="form-inline" action="#" @onsubmit="SendAsync">
             Say something:
             <input class="form-control" @bind="message" disabled="@(!IsConnected)" />
