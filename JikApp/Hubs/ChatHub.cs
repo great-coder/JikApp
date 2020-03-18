@@ -1,26 +1,49 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using JikApp.Data;
+using Microsoft.AspNetCore.SignalR;
 
 namespace JikApp.Hubs
 {
-    [Authorize]
+    //[Authorize]
     public class ChatHub : Hub
     {
         public override Task OnConnectedAsync()
         {
-            return Clients.All.SendAsync("SendAction", $"{Context.User.Identity.Name} joined");
+            // TODO: online_users++
+            return Clients.All.SendAsync("SendAction", new Jik()
+            {
+                SenderId = "System",
+                Created_At = DateTime.Now,
+                Message = $"{Context.User.Identity.Name} joined."
+            });
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            return Clients.All.SendAsync("SendAction", $"{Context.User.Identity.Name} left");
+            // TODO: online_users--
+            return Clients.All.SendAsync("SendAction",
+                new Jik()
+                {
+                    SenderId = "System",
+                    Created_At = DateTime.Now,
+                    Message = $"{Context.User.Identity.Name} left."
+                });
         }
 
-        public Task Send(string message)
+        public Task GetJiks()
         {
-            return Clients.All.SendAsync("SendMessage", $"{Context.User.Identity.Name}: {message}");
+            var dbContext = EF_Model.dbContext;
+            return Clients.All.SendAsync("GetJiksAction", new List<Jik>(dbContext.Jiks));
+        }
+
+        public async Task<Task> Send(Jik jik)
+        {
+            var dbContext = EF_Model.dbContext;
+            dbContext.Jiks.Add(jik);
+            await dbContext.SaveChangesAsync();
+            return Clients.All.SendAsync("SendMessage", jik);
         }
     }
 }
