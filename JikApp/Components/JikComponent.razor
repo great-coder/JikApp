@@ -1,0 +1,38 @@
+﻿@if (jik != null && CurrentUserId != null)
+{
+    @if (CurrentUserId == jik.SenderId)
+    {
+        // I'm sender
+        <div class="card base-jik sender">
+            <div class="card-header">
+                You:
+            </div>
+            <div class="card-body">
+                @jik.Message
+            </div>
+            <div class="card-footer small text-right">
+                @jik.Created_At
+            </div>
+        </div>
+    }
+    else
+    {
+        // I'm receiver
+        <div class="card base-jik receiver">
+            <div class="card-header">
+                @jik.SenderId:
+            </div>
+            <div class="card-body">
+                @jik.Message
+            </div>
+            <div class="card-footer small text-right">
+                @jik.Created_At
+            </div>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public Data.Jik jik { get; set; }
+    [Parameter] public string CurrentUserId { get; set; }
+}
