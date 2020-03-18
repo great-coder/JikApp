@@ -1,0 +1,14 @@
+﻿.base-jik {
+    color: black;
+    cursor: pointer;
+    margin: 5px;
+    width: auto;
+}
+
+.sender {
+    background-color: cornflowerblue;
+}
+
+.receiver {
+    background-color: antiquewhite;
+}
