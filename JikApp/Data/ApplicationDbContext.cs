@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+using JikApp.Data.Calendar;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,5 +50,7 @@ namespace JikApp.Data
         }
 
         public DbSet<Jik> Jiks { get; set; }
+
+        public DbSet<Event> Events { get; set; }
     }
 }
