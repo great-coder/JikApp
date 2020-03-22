@@ -5,32 +5,25 @@
 
 <div class="text-right" dir="rtl">
     <h3>تقویم شخصی ایرانی</h3>
-    <div class="row">
-        <form class="form-inline" action="#" @onsubmit="AddEventAsync">
-            <label class="ml-2">افزودن رویداد به تقویم:</label>
-            <input class="form-control ml-2" @bind="eventTitle" required />
-            <input type="date" class="form-control ml-2" @bind="eventDate" required />
-            <select @bind="eventType" class="form-control ml-2">
-                <option>@TYPE.WORK_DAY</option>
-                <option>@TYPE.DAY_OFF</option>
-            </select>
-            <button class="btn btn-primary">
-                <span class="oi oi-plus" aria-hidden="true"></span>
-                افزودن
-            </button>
-        </form>
-    </div>
-    <hr />
+    @if (includeAddPanel)
+    {
+        <AuthorizeView>
+            <Authorized>
+                <JikApp.Components.Calendar.CalendarAddEvent />
+                <hr />
+            </Authorized>
+        </AuthorizeView>
+    }
     <div class="row">
         @if (events != null)
         {
             <div class="col-5">
-                <JikApp.Components.CalendarMonth _datetime="nowTime" />
+                <JikApp.Components.Calendar.CalendarMonth _datetime="nowTime" />
             </div>
             <div class="col">
                 @foreach (var _event in events)
                 {
-                    <JikApp.Components.CalendarEvents _event="_event" />
+                    <JikApp.Components.Calendar.CalendarEvents _event="_event" />
                 }
             </div>
         }
@@ -44,38 +37,28 @@
 </div>
 
 @code {
-    List<Data.Calendar.Event> events;
-    string eventTitle;
-    DateTime eventDate;
-    TYPE eventType;
+    [Parameter] public bool includeAddPanel { get; set; } = true;
 
+    List<Data.Calendar.Event> events;
     DateTime nowTime = DateTime.Now;
+    List<Data.Calendar.Event> tmpEvents;
 
     protected override async Task OnInitializedAsync()
     {
         await GetEventsAsync();
     }
 
-    async Task AddEventAsync()
-    {
-        if (eventTitle.Length >= 2)
-        {
-            await CalendarService.AddDayEventsAsync(eventDate, eventTitle, eventType);
-            eventTitle = "";
-            //eventDate = nowTime;
-            await GetEventsAsync();
-        }
-    }
-
     async Task GetEventsAsync()
     {
         events = null;
+        tmpEvents = null;
         StateHasChanged();
         await Task.Run(() =>
         {
             events = CalendarService.GetMonthEvents(nowTime);
-            //eventDate = nowTime;
-        });
+            tmpEvents = events;
+        //eventDate = nowTime;
+    });
         StateHasChanged();
     }
 }

@@ -62,7 +62,6 @@
 
 @code {
     [Parameter] public DateTime _datetime { get; set; }
-    //[Parameter] public List<Data.Calendar.Event> _events { get; set; }
 
     PersianCalendar pc = new PersianCalendar();
     HijriCalendar hc = new HijriCalendar();
@@ -72,8 +71,6 @@
     int currentDayofMonth;
     DateTime fdog;
     int daysInMonth;
-
-    int[] days_off;
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,12 +90,6 @@
             daysOfWeek[4] = DayOfWeek.Wednesday;
             daysOfWeek[5] = DayOfWeek.Thursday;
             daysOfWeek[6] = DayOfWeek.Friday;
-
-            //days_off = new int[daysInMonth + 1];
-            //foreach (var _ev in _events)
-            //{
-            //    days_off[pc.GetDayOfMonth(_ev.DateTime)] = 1;
-            //}
         }
     }
 }
