@@ -1,0 +1,134 @@
+﻿@using System.Globalization;
+
+@if (_datetime != null)
+{
+    <table class="table table-bordered table-hover table-striped text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th>
+                    شنبه
+                </th>
+                <th>
+                    یکشنبه
+                </th>
+                <th>
+                    دوشنبه
+                </th>
+                <th>
+                    سه‌شنبه
+                </th>
+                <th>
+                    چهارشنبه
+                </th>
+                <th>
+                    پنجشنبه
+                </th>
+                <th>
+                    جمعه
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                @{
+                    int k = 0;
+                    int x = 0;
+                    int w = 1;
+                    while (k <= 7)
+                    {
+                        if (startDayofMonth.CompareTo(daysOfWeek[x]) == 0)
+                        {
+                            break;
+                        }
+                        x++;
+                        <td></td>
+                    }
+                    k = 7 - x;
+                    for (; i <= k; i++)
+                    {
+                        if (i == k)
+                        {
+                            // it's friday
+                            <td class="text-danger" style="background-color: lightgray;">@i</td>
+                        }
+                        else if (currentDayofMonth == i)
+                        {
+                            <td class="text-primary bg-warning border border-primary">@i</td>
+                        }
+                        else
+                        {
+                            <td>@i</td>
+                        }
+                    }
+                    w++;
+                }
+            </tr>
+            @{
+                bool isDone = false;
+                int r = 0;
+                while (!isDone && w < 7)
+                {
+                    k = w * 7 - x;
+                    w++;
+                    if (daysInMonth < k)
+                    {
+                        k = daysInMonth;
+                        isDone = true;
+                    }
+                    r = 0;
+                    <tr>
+                        @for (; i <= k; i++)
+                        {
+                            if (r == 6)
+                            {
+                                // it's friday
+                                <td class="text-danger" style="background-color: lightgray;">@i</td>
+                            }
+                            else if (currentDayofMonth == i)
+                            {
+                                <td class="text-primary bg-warning border border-primary">@i</td>
+                            }
+                            else
+                            {
+                                <td>@i</td>
+                            }
+                            r++;
+                        }
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter] public DateTime _datetime { get; set; }
+
+    PersianCalendar pc = new PersianCalendar();
+    DayOfWeek startDayofMonth;
+    DayOfWeek[] daysOfWeek;
+    int currentDayofMonth;
+    int i;
+    int daysInMonth;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_datetime != null)
+        {
+            currentDayofMonth = pc.GetDayOfMonth(_datetime);
+            daysInMonth = pc.GetDaysInMonth(_datetime.Year, _datetime.Month);
+            int s = _datetime.Day - currentDayofMonth;
+            s = (s < 0) ? 30 - s : s + 1;
+            startDayofMonth = pc.GetDayOfWeek(new DateTime(_datetime.Year, _datetime.Month, s));
+            i = 1;
+            daysOfWeek = new DayOfWeek[7];
+            daysOfWeek[0] = DayOfWeek.Saturday;
+            daysOfWeek[1] = DayOfWeek.Sunday;
+            daysOfWeek[2] = DayOfWeek.Monday;
+            daysOfWeek[3] = DayOfWeek.Tuesday;
+            daysOfWeek[4] = DayOfWeek.Wednesday;
+            daysOfWeek[5] = DayOfWeek.Thursday;
+            daysOfWeek[6] = DayOfWeek.Friday;
+        }
+    }
+}
