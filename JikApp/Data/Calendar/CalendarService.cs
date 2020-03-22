@@ -19,7 +19,7 @@ namespace JikApp.Data.Calendar
         public List<Event> GetMonthEvents(DateTime _reqDate)
         {
             int _reqPerMonth = pc.GetMonth(_reqDate);
-            int _reqPerYear = pc.GetMonth(_reqDate);
+            int _reqPerYear = pc.GetYear(_reqDate);
             var db = EF_Model.dbContext;
             return db.Events.AsEnumerable().Where(d => pc.GetMonth(d.DateTime) == _reqPerMonth && pc.GetYear(d.DateTime) == _reqPerYear).OrderBy(d => d.DateTime).ToList();
         }

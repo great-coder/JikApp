@@ -24,10 +24,10 @@
     <div class="row">
         @if (events != null)
         {
-            <div class="col">
+            <div class="col-5">
                 <JikApp.Components.CalendarMonth _datetime="nowTime" />
             </div>
-            <div class="col-4">
+            <div class="col">
                 @foreach (var _event in events)
                 {
                     <JikApp.Components.CalendarEvents _event="_event" />
