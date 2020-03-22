@@ -1,0 +1,34 @@
+﻿@using System.Globalization;
+@using Data.Calendar;
+
+@if (_event != null)
+{
+    if (_event.EventType == TYPE.WORK_DAY)
+    {
+        <div>
+            @persianDate -
+            @_event.Title
+        </div>
+    }
+    else
+    {
+        <div class="text-danger">
+            @persianDate -
+            @_event.Title
+        </div>
+    }
+}
+
+@code {
+    PersianCalendar pc = new PersianCalendar();
+    string persianDate;
+    [Parameter] public Data.Calendar.Event _event { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(() =>
+        {
+            persianDate = pc.GetYear(_event.DateTime) + "/" + pc.GetMonth(_event.DateTime) + "/" + pc.GetDayOfMonth(_event.DateTime);
+        });
+    }
+}
