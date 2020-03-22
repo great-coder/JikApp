@@ -1,0 +1,81 @@
+﻿@page "/calendar"
+
+@using JikApp.Data.Calendar;
+@inject CalendarService CalendarService
+
+<div class="text-right" dir="rtl">
+    <h3>تقویم شخصی ایرانی</h3>
+    <div class="row">
+        <form class="form-inline" action="#" @onsubmit="AddEventAsync">
+            <label class="ml-2">افزودن رویداد به تقویم:</label>
+            <input class="form-control ml-2" @bind="eventTitle" required />
+            <input type="date" class="form-control ml-2" @bind="eventDate" required />
+            <select @bind="eventType" class="form-control ml-2">
+                <option>@TYPE.WORK_DAY</option>
+                <option>@TYPE.DAY_OFF</option>
+            </select>
+            <button class="btn btn-primary">
+                <span class="oi oi-plus" aria-hidden="true"></span>
+                افزودن
+            </button>
+        </form>
+    </div>
+    <hr />
+    <div class="row">
+        @if (events != null)
+        {
+            <div class="col">
+                <JikApp.Components.CalendarMonth _datetime="nowTime" />
+            </div>
+            <div class="col-4">
+                @foreach (var _event in events)
+                {
+                    <JikApp.Components.CalendarEvents _event="_event" />
+                }
+            </div>
+        }
+        else
+        {
+            <div class="col">
+                Loading ...
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    List<Data.Calendar.Event> events;
+    string eventTitle;
+    DateTime eventDate;
+    TYPE eventType;
+
+    DateTime nowTime = DateTime.Now;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEventsAsync();
+    }
+
+    async Task AddEventAsync()
+    {
+        if (eventTitle.Length >= 2)
+        {
+            await CalendarService.AddDayEventsAsync(eventDate, eventTitle, eventType);
+            eventTitle = "";
+            //eventDate = nowTime;
+            await GetEventsAsync();
+        }
+    }
+
+    async Task GetEventsAsync()
+    {
+        events = null;
+        StateHasChanged();
+        await Task.Run(() =>
+        {
+            events = CalendarService.GetMonthEvents(nowTime);
+            //eventDate = nowTime;
+        });
+        StateHasChanged();
+    }
+}
