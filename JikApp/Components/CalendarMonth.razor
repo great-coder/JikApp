@@ -2,29 +2,29 @@
 
 @if (_datetime != null)
 {
-    <table class="table table-bordered table-hover table-striped text-center">
+    <table class="table table-bordered table-hover table-striped text-center small">
         <thead class="thead-dark">
             <tr>
-                <th>
-                    شنبه
+                <th title="شنبه">
+                    ش
                 </th>
-                <th>
-                    یکشنبه
+                <th title="یکشنبه">
+                    ی
                 </th>
-                <th>
-                    دوشنبه
+                <th title="دوشنبه">
+                    د
                 </th>
-                <th>
-                    سه‌شنبه
+                <th title="سه‌شنبه">
+                    س
                 </th>
-                <th>
-                    چهارشنبه
+                <th title="چهارشنبه">
+                    چ
                 </th>
-                <th>
-                    پنجشنبه
+                <th title="پنجشنبه">
+                    پ
                 </th>
-                <th>
-                    جمعه
+                <th title="جمعه">
+                    ج
                 </th>
             </tr>
         </thead>
@@ -49,16 +49,47 @@
                         if (i == k)
                         {
                             // it's friday
-                            <td class="text-danger" style="background-color: lightgray;">@i</td>
+                            <td class="text-danger" style="background-color: lightgray;">
+                                <div>
+                                    @i
+                                </div>
+                                <div class="small" style="float:right">
+                                    @fdog.Day
+                                </div>
+                                <div class="small" style="float:left">
+                                    @hc.GetDayOfMonth(fdog)
+                                </div>
+                            </td>
                         }
                         else if (currentDayofMonth == i)
                         {
-                            <td class="text-primary bg-warning border border-primary">@i</td>
+                            <td class="text-primary bg-warning border border-primary">
+                                <div>
+                                    @i
+                                </div>
+                                <div class="small" style="float:right">
+                                    @fdog.Day
+                                </div>
+                                <div class="small" style="float:left">
+                                    @hc.GetDayOfMonth(fdog)
+                                </div>
+                            </td>
                         }
                         else
                         {
-                            <td>@i</td>
+                            <td>
+                                <div>
+                                    @i
+                                </div>
+                                <div class="small" style="float:right">
+                                    @fdog.Day
+                                </div>
+                                <div class="small" style="float:left">
+                                    @hc.GetDayOfMonth(fdog)
+                                </div>
+                            </td>
                         }
+                        fdog = fdog.AddDays(1);
                     }
                     w++;
                 }
@@ -82,17 +113,48 @@
                             if (r == 6)
                             {
                                 // it's friday
-                                <td class="text-danger" style="background-color: lightgray;">@i</td>
+                                <td class="text-danger" style="background-color: lightgray;">
+                                    <div>
+                                        @i
+                                    </div>
+                                    <div class="small" style="float:right">
+                                        @fdog.Day
+                                    </div>
+                                    <div class="small" style="float:left">
+                                        @hc.GetDayOfMonth(fdog)
+                                    </div>
+                                </td>
                             }
                             else if (currentDayofMonth == i)
                             {
-                                <td class="text-primary bg-warning border border-primary">@i</td>
+                                <td class="text-primary bg-warning border border-primary">
+                                    <div>
+                                        @i
+                                    </div>
+                                    <div class="small" style="float:right">
+                                        @fdog.Day
+                                    </div>
+                                    <div class="small" style="float:left">
+                                        @hc.GetDayOfMonth(fdog)
+                                    </div>
+                                </td>
                             }
                             else
                             {
-                                <td>@i</td>
+                                <td>
+                                    <div>
+                                        @i
+                                    </div>
+                                    <div class="small" style="float:right">
+                                        @fdog.Day
+                                    </div>
+                                    <div class="small" style="float:left">
+                                        @hc.GetDayOfMonth(fdog)
+                                    </div>
+                                </td>
                             }
                             r++;
+                            fdog = fdog.AddDays(1);
                         }
                     </tr>
                 }
@@ -105,10 +167,13 @@
     [Parameter] public DateTime _datetime { get; set; }
 
     PersianCalendar pc = new PersianCalendar();
+    HijriCalendar hc = new HijriCalendar();
+
     DayOfWeek startDayofMonth;
     DayOfWeek[] daysOfWeek;
     int currentDayofMonth;
     int i;
+    DateTime fdog;
     int daysInMonth;
 
     protected override async Task OnInitializedAsync()
@@ -118,7 +183,8 @@
             currentDayofMonth = pc.GetDayOfMonth(_datetime);
             daysInMonth = pc.GetDaysInMonth(_datetime.Year, _datetime.Month);
             int s = _datetime.Day - currentDayofMonth;
-            s = (s < 0) ? 30 - s : s + 1;
+            s = (s < 0) ? 30 - s : s + daysInMonth - 30;
+            fdog = new DateTime(_datetime.Year, _datetime.Month, s);
             startDayofMonth = pc.GetDayOfWeek(new DateTime(_datetime.Year, _datetime.Month, s));
             i = 1;
             daysOfWeek = new DayOfWeek[7];
