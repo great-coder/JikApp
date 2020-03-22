@@ -1,0 +1,104 @@
+﻿@using System.Globalization;
+
+@if (_datetime != null)
+{
+    <div class="container">
+        <!-- Calendar -->
+        <div class="calendar shadow bg-white text-center">
+            <div class="d-flex align-items-center">
+                <h2><i class="oi oi-calendar ml-3"></i></h2>
+            </div>
+            <ol class="day-names list-unstyled">
+                <li class="font-weight-bold" title="شنبه">ش</li>
+                <li class="font-weight-bold" title="یک‌شنبه">ی</li>
+                <li class="font-weight-bold" title="دوشنبه">د</li>
+                <li class="font-weight-bold" title="سه‌شنبه">س</li>
+                <li class="font-weight-bold" title="چهارشنبه">چ</li>
+                <li class="font-weight-bold" title="پنج‌شنبه">پ</li>
+                <li class="font-weight-bold" title="جمعه">ج</li>
+            </ol>
+
+            <ol class="days list-unstyled">
+                @{
+                    int k = 0;
+                    int x = 0;
+                    while (k <= 7)
+                    {
+                        if (startDayofMonth.CompareTo(daysOfWeek[x]) == 0)
+                        {
+                            break;
+                        }
+                        x++;
+                        <li>
+                            <div class="date"></div>
+                        </li>
+                    }
+                    string _class;
+                    for (int j = 1; j <= daysInMonth; j++)
+                    {
+                        _class = "";
+                        if (fdog.DayOfWeek == DayOfWeek.Friday)
+                        {
+                            // it's friday
+                            _class += "day-off";
+                        }
+                        if (j == currentDayofMonth)
+                        {
+                            _class += " today";
+
+                        }
+                        <li class="@_class">
+                            <div class="date">@j</div>
+                            <div class="small event" style="float:right">@fdog.Day</div>
+                            <div class="small event" style="float:left">@hc.GetDayOfMonth(fdog)</div>
+                        </li>
+                        fdog = fdog.AddDays(1);
+                    }
+                }
+            </ol>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public DateTime _datetime { get; set; }
+    //[Parameter] public List<Data.Calendar.Event> _events { get; set; }
+
+    PersianCalendar pc = new PersianCalendar();
+    HijriCalendar hc = new HijriCalendar();
+
+    DayOfWeek startDayofMonth;
+    DayOfWeek[] daysOfWeek;
+    int currentDayofMonth;
+    DateTime fdog;
+    int daysInMonth;
+
+    int[] days_off;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_datetime != null)
+        {
+            currentDayofMonth = pc.GetDayOfMonth(_datetime);
+            daysInMonth = pc.GetDaysInMonth(_datetime.Year, _datetime.Month);
+            int s = _datetime.Day - currentDayofMonth;
+            s = (s < 0) ? 30 - s : s + daysInMonth - 30;
+            fdog = new DateTime(_datetime.Year, _datetime.Month, s);
+            startDayofMonth = pc.GetDayOfWeek(new DateTime(_datetime.Year, _datetime.Month, s));
+            daysOfWeek = new DayOfWeek[7];
+            daysOfWeek[0] = DayOfWeek.Saturday;
+            daysOfWeek[1] = DayOfWeek.Sunday;
+            daysOfWeek[2] = DayOfWeek.Monday;
+            daysOfWeek[3] = DayOfWeek.Tuesday;
+            daysOfWeek[4] = DayOfWeek.Wednesday;
+            daysOfWeek[5] = DayOfWeek.Thursday;
+            daysOfWeek[6] = DayOfWeek.Friday;
+
+            //days_off = new int[daysInMonth + 1];
+            //foreach (var _ev in _events)
+            //{
+            //    days_off[pc.GetDayOfMonth(_ev.DateTime)] = 1;
+            //}
+        }
+    }
+}

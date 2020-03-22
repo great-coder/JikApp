@@ -1,0 +1,90 @@
+﻿.day-names {
+    border-bottom: 1px solid #008bff;
+}
+
+.calendar ol::after, .clearfix::after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.calendar {
+    border-radius: 10px;
+}
+
+.month {
+    font-size: 2rem;
+}
+
+.today {
+    border: .1rem solid #289a00;
+    border-radius: 12px;
+}
+
+.day-off {
+    background-color: #d5d5d5;
+    color: orangered;
+}
+
+@media (min-width:992px) {
+    .month {
+        font-size: 3.5rem;
+    }
+}
+
+.calendar ol li {
+    float: right;
+    width: 14.28571%;
+    margin-bottom: 2px;
+}
+
+.calendar .day-names li {
+    text-transform: uppercase;
+    margin-bottom: 0;
+}
+
+.calendar .days li {
+    min-height: 3rem;
+    /*margin: .1rem;*/
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+    .calendar .days li .date {
+        /*margin: .5rem 0;*/
+    }
+
+    .calendar .days li .event {
+        font-size: .6rem;
+        padding-right: .4rem;
+        padding-left: .4rem;
+        padding-bottom: .2rem;
+        /*color: #fff;*/
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        /*border-radius: 4rem;*/
+        /*margin-bottom: 1px;*/
+    }
+
+        .calendar .days li .event.span-2 {
+            width: 200%;
+        }
+
+        .calendar .days li .event.begin {
+            border-radius: 1rem 0 0 1rem;
+        }
+
+        .calendar .days li .event.end {
+            border-radius: 0 1rem 1rem 0;
+        }
+
+    .calendar .days li:nth-child(n+29) {
+        border-bottom: none;
+    }
+
+    .calendar .days li.outside .date {
+        color: #ddd;
+    }
